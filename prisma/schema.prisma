@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "darwin", "darwin-arm64"]
+}
+
+model users {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  phone          String           @unique
+  name           String
+  password       String
+  avatar         String?
+  money          Float?           @default(0)
+  isAdmin        Boolean?         @default(false)
+  createdAt      DateTime         @default(now())
+  comments       comments[]
+  amoutBlock     Float?           @default(0)
+  bankingHistory bankingHistory[]
+  blocked        Boolean?         @default(true)
+}
+
+model images {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  url           String
+  name          String?
+  address       String?
+  contactPerson String?
+  travelAddress String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model connects {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  age       Int
+  gender    Boolean
+  avatar    String?
+  address   String?
+  job       String?
+  favorite  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model products {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  price     Float
+  url       String
+  votes     Float?
+  bonus     Float?
+  purchases Int
+  views     Int?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  comments  comments[]
+}
+
+model comments {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId String   @unique @db.ObjectId
+  product   products @relation(fields: [productId], references: [id])
+  userId    String   @unique @db.ObjectId
+  user      users    @relation(fields: [userId], references: [id])
+  comment   String
+  votes     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model bankingHistory {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  bankingName     String?
+  name            String?
+  accountNumber   String?
+  transactionType String?
+  amount          Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  userId          String   @unique @db.ObjectId
+  user            users    @relation(fields: [userId], references: [id])
+  status          String   @default("pending")
+  reason          String?
+  content         String?
+}
+
+model adminBank {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  bankingName   String
+  name          String
+  accountNumber String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
